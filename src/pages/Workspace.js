@@ -43,7 +43,8 @@ class Workspace extends Component {
     super();
 
     this.state = {
-      days: []
+      days: [],
+      savedDays: []
     };
   }
 
@@ -98,6 +99,20 @@ class Workspace extends Component {
     }));
   };
 
+  saveDay = dayId => {
+    this.setState(prevState => ({
+      days: prevState.days.filter(day => {
+        return day.id !== dayId;
+      }),
+      savedDays: [
+        ...prevState.savedDays,
+        prevState.days.filter(day => {
+          return day.id === dayId;
+        })
+      ]
+    }));
+  };
+
   render() {
     const { tripBudget, tripName } = this.props;
     const { days } = this.state;
@@ -127,7 +142,11 @@ class Workspace extends Component {
             {days.map((day, i) => {
               return (
                 <Item key={day.id} i={i}>
-                  <Day details={day} updateDay={this.updateDay} />
+                  <Day
+                    details={day}
+                    updateDay={this.updateDay}
+                    saveDay={() => this.saveDay(day.id)}
+                  />
                 </Item>
               );
             })}

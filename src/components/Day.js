@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const Day = ({ details, updateDay }) => {
+const Day = ({ details, updateDay, saveDay }) => {
   return (
     <div className="day">
       <div>
@@ -31,7 +31,7 @@ const Day = ({ details, updateDay }) => {
           onChange={e => updateDay(e, details.id)}
         />
       </div>
-      <button className="btn">
+      <button className="btn" onClick={saveDay}>
         Save Day <FontAwesomeIcon icon="calendar-plus" />
       </button>
     </div>
