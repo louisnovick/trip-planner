@@ -1,45 +1,94 @@
 import React, { Component } from "react";
+import posed, { PoseGroup } from "react-pose";
 import Day from "./../components/Day";
-// import Modal from "../components/Modal";
+
+const Item = posed.div({
+  enter: {
+    opacity: 1,
+    y: 0,
+    delay: ({ i }) => i * 50
+  },
+  exit: {
+    opacity: 0,
+    y: -10
+  }
+});
+
+const Amount = posed.h3({
+  over: {
+    color: "#ed254e",
+    y: 0,
+    transition: () => ({
+      color: {
+        type: "tween",
+        duration: 100
+      },
+      y: {
+        type: "spring",
+        stiffness: 200,
+        damping: 20,
+        duration: 100,
+        from: 5,
+        to: 0
+      }
+    })
+  },
+  under: {
+    color: "#2ba84a"
+  }
+});
 
 class Workspace extends Component {
   constructor() {
     super();
 
     this.state = {
-      // modalIsVisible: false
       days: []
     };
   }
 
+  componentDidMount() {
+    this.generateDays();
+  }
+
   componentDidUpdate(prevProps) {
     if (prevProps.tripDuration !== this.props.tripDuration) {
-      let i = 0;
-      let days = [];
-
-      while (i < this.props.tripDuration) {
-        i++;
-
-        const newDay = {
-          budget: 100,
-          location: "Orlando",
-          notes: "This will be a great day",
-          id: i
-        };
-
-        days.push(newDay);
-      }
-
-      this.setState({
-        days
-      });
+      this.generateDays();
     }
   }
 
+  generateDays = () => {
+    let i = 0;
+    let days = [];
+
+    while (i < this.props.tripDuration) {
+      i++;
+
+      const newDay = {
+        budget: 0,
+        location: "Moab, UT",
+        notes: "What are you doing today?",
+        id: i
+      };
+
+      days.push(newDay);
+    }
+
+    this.setState({
+      days
+    });
+  };
+
   updateDay = (e, dayToUpdate) => {
+    let value = e.target.value;
+
+    if (e.target.name === "budget") {
+      // value = value && value >= 0 ? parseInt(value) : 0;
+      value = parseInt(value);
+    }
+
     const updated = {
-      [e.target.name]:
-        e.target.type === "number" ? parseInt(e.target.value) : e.target.value
+      [e.target.name]: value
     };
 
     this.setState(prevState => ({
@@ -49,14 +98,8 @@ class Workspace extends Component {
     }));
   };
 
-  // toggleModal = () => {
-  //   this.setState({
-  //     modalIsVisible: !this.state.modalIsVisible
-  //   });
-  // };
-
   render() {
-    const { tripBudget, tripName, tripDuration } = this.props;
+    const { tripBudget, tripName } = this.props;
     const { days } = this.state;
     let daysBudgetSpent;
 
@@ -68,30 +111,28 @@ class Workspace extends Component {
       daysBudgetSpent = 0;
     }
 
+    const moneyLeft = tripBudget - daysBudgetSpent;
+
     return (
-      <div>
-        <h1>{tripName}</h1>
-        <div>You'll be gone for {tripDuration} days</div>
-        <div>You have ${tripBudget} to spend</div>
+      <div className="workspace">
+        <div className="heading">
+          <h1>{tripName}</h1>
+          <Amount poseKey={moneyLeft} pose={moneyLeft < 0 ? "over" : "under"}>
+            Left to spend: ${moneyLeft}
+          </Amount>
+        </div>
 
-        <div>Total budget left - {tripBudget - daysBudgetSpent}</div>
-
-        {days.map(day => {
-          return <Day key={day.id} details={day} updateDay={this.updateDay} />;
-        })}
-
-        {/* <Modal active={this.state.modalIsVisible}>
-          <h1>I'm a modal</h1>
-          <p>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Delectus
-            non facere molestiae quod saepe esse in odit obcaecati. Similique
-            dolorem vitae quis perspiciatis enim accusamus quas ipsum non id
-            expedita aperiam sunt sint eos commodi, rem tenetur eligendi eveniet
-            placeat recusandae nam.
-          </p>
-        </Modal> */}
-
-        {/* <button onClick={this.toggleModal}>Open Modal</button> */}
+        <div className="days">
+          <PoseGroup>
+            {days.map((day, i) => {
+              return (
+                <Item key={day.id} i={i}>
+                  <Day details={day} updateDay={this.updateDay} />
+                </Item>
+              );
+            })}
+          </PoseGroup>
+        </div>
       </div>
     );
   }

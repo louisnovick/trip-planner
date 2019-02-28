@@ -1,20 +1,20 @@
 import React, { Component } from "react";
-import posed, { PoseGroup } from "react-pose";
-import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
-import Home from "./pages/Home";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faCalendarPlus, faCompass } from "@fortawesome/free-solid-svg-icons";
 import Workspace from "./pages/Workspace";
 import SetupTrip from "./components/SetupTrip";
 
-const RouteContainer = posed.div({
-  enter: { opacity: 1 },
-  exit: { opacity: 0 }
-});
+library.add(faCalendarPlus, faCompass);
 
 class App extends Component {
   constructor() {
     super();
 
-    this.state = {};
+    this.state = {
+      tripBudget: 0,
+      tripName: "Going West",
+      tripDuration: 3
+    };
   }
 
   updateField = e => {
@@ -25,47 +25,15 @@ class App extends Component {
 
   render() {
     return (
-      <BrowserRouter>
-        <div className="app">
-          <header>
-            <nav>
-              <ul>
-                <li>
-                  <Link to="/">Home</Link>
-                </li>
-                <li>
-                  <Link to="/workspace">Workspace</Link>
-                </li>
-              </ul>
-            </nav>
-          </header>
+      <div className="app">
+        <SetupTrip handleChange={this.updateField} {...this.state} />
 
-          <SetupTrip handleChange={this.updateField} />
-
-          <Workspace
-            tripName={this.state.tripName}
-            tripBudget={this.state.tripBudget}
-            tripDuration={this.state.tripDuration}
-          />
-
-          {/* <Route
-            render={({ location }) => (
-              <PoseGroup>
-                <RouteContainer key={location.key}>
-                  <Switch location={location}>
-                    <Route exact path="/" component={Home} key="home" />
-                    <Route
-                      path="/workspace"
-                      component={Workspace}
-                      key="workspace"
-                    />
-                  </Switch>
-                </RouteContainer>
-              </PoseGroup>
-            )}
-          /> */}
-        </div>
-      </BrowserRouter>
+        <Workspace
+          tripName={this.state.tripName}
+          tripBudget={this.state.tripBudget}
+          tripDuration={this.state.tripDuration}
+        />
+      </div>
     );
   }
 }
